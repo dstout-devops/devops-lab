@@ -1,4 +1,5 @@
 docker_host: "localhost"
+ssh_dir: "~/.ssh"
 container_name: "swarm_node"
 internal_port: 8080
 external_port: 8080

@@ -3,63 +3,53 @@
   register: _terraform_command
   changed_when: false
   tags:
-    - terraform_apply
-    - terraform_destroy
-    - terraform_init
-    - terraform_inventory
-    - terraform_plan
+    - always
 
 - name: Terraform - Set Command Path
   ansible.builtin.set_fact:
     terraform_command: "{{ _terraform_command['stdout'] }}"
   tags:
-    - terraform_apply
-    - terraform_destroy
-    - terraform_init
-    - terraform_inventory
-    - terraform_plan
+    - always
 
 - name: Terraform - Create Directory
   ansible.builtin.file:
     path: "{{ terraform_dir }}"
     state: directory
     mode: '0644'
+  tags:
+    - always
 
 - name: Terraform - Check Directory
   ansible.builtin.find:
     paths: "{{ terraform_dir }}"
     patterns: "*.tf"
   register: files_to_delete
+  tags:
+    - always
 
 - name: Clean Terraform Directory
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
   with_items: "{{ files_to_delete.files }}"
+  tags:
+    - always
 
-- name: Generate Terraform Swarm Node
+- name: Terraform - Generate Node Files
   ansible.builtin.template:
     src: swarm_node.tf.j2
     dest: "{{ terraform_dir }}/swarm_node.tf"
     mode: '0644'
-    tags:
-      - terraform_apply
-      - terraform_destroy
-      - terraform_init
-      - terraform_inventory
-      - terraform_plan
+  tags:
+    - always
 
-- name: Generate Terraform Provider
+- name: Terraform - Generate Provider
   ansible.builtin.template:
     src: main.tf.j2
     dest: "{{ terraform_dir }}/main.tf"
     mode: '0755'
   tags:
-    - terraform_apply
-    - terraform_destroy
-    - terraform_init
-    - terraform_inventory
-    - terraform_plan
+    - always
 
 - name: Terraform - Init
   ansible.builtin.command: "{{ terraform_command }} init -get=true -input=false"
