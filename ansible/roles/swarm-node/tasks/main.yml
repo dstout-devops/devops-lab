@@ -1,0 +1,101 @@
+- name: Terraform - Capture Command
+  ansible.builtin.command: which terraform
+  register: _terraform_command
+  changed_when: false
+  tags:
+    - terraform_apply
+    - terraform_destroy
+    - terraform_init
+    - terraform_inventory
+    - terraform_plan
+
+- name: Terraform - Set Command Path
+  ansible.builtin.set_fact:
+    terraform_command: "{{ _terraform_command['stdout'] }}"
+  tags:
+    - terraform_apply
+    - terraform_destroy
+    - terraform_init
+    - terraform_inventory
+    - terraform_plan
+
+- name: Terraform - Create Directory
+  ansible.builtin.file:
+    path: "{{ terraform_dir }}"
+    state: directory
+    mode: '0644'
+
+- name: Terraform - Check Directory
+  ansible.builtin.find:
+    paths: "{{ terraform_dir }}"
+    patterns: "*.tf"
+  register: files_to_delete
+
+- name: Clean Terraform Directory
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+
+- name: Generate Terraform Swarm Node
+  ansible.builtin.template:
+    src: swarm_node.tf.j2
+    dest: "{{ terraform_dir }}/swarm_node.tf"
+    mode: '0644'
+    tags:
+      - terraform_apply
+      - terraform_destroy
+      - terraform_init
+      - terraform_inventory
+      - terraform_plan
+
+- name: Generate Terraform Provider
+  ansible.builtin.template:
+    src: main.tf.j2
+    dest: "{{ terraform_dir }}/main.tf"
+    mode: '0755'
+  tags:
+    - terraform_apply
+    - terraform_destroy
+    - terraform_init
+    - terraform_inventory
+    - terraform_plan
+
+- name: Terraform - Init
+  ansible.builtin.command: "{{ terraform_command }} init -get=true -input=false"
+  register: _terraform_init_state
+  changed_when: false
+  args:
+    chdir: "{{ terraform_dir }}"
+  tags:
+    - terraform_init
+
+- name: Terraform - Plan
+  ansible.builtin.command: "{{ terraform_command }} plan -out=tfplan -input=false -detailed-exitcode"
+  register: _terraform_plan
+  changed_when: false
+  args:
+    chdir: "{{ terraform_dir }}"
+  tags:
+    - terraform_apply
+    - terraform_plan
+  failed_when: _terraform_plan['rc'] > 2
+
+- name: Terraform - Apply
+  ansible.builtin.command: "{{ terraform_command }} apply -input=false -auto-approve tfplan"
+  register: _terraform_apply
+  changed_when: false
+  args:
+    chdir: "{{ terraform_dir }}"
+  when: _terraform_plan['rc'] == 0 or _terraform_plan['rc'] == 2
+  tags:
+    - terraform_apply
+
+- name: Terraform - Destroy
+  ansible.builtin.command: "{{ terraform_command }} destroy -auto-approve"
+  register: _terraform_destroy
+  changed_when: false
+  args:
+    chdir: "{{ terraform_dir }}"
+  tags:
+    - terraform_destroy

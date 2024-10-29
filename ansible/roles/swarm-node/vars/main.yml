@@ -1,0 +1,10 @@
+docker_host: "localhost"
+container_name: "swarm_node"
+internal_port: 8080
+external_port: 8080
+
+docker_image: "docker:dind"
+image_version: "latest"
+swarm_nodes: 3
+
+terraform_dir: "~/.terraform"

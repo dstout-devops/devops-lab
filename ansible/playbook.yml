@@ -1,0 +1,5 @@
+- name: Enable Swarm Host
+  hosts: localhost
+  become: true
+  roles:
+    - swarm-node

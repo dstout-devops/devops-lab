@@ -1,0 +1,9 @@
+services:
+  devcontainer:
+    hostname: devcontainer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    volumes:
+      - ../:/workspace:cached

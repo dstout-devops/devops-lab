@@ -1,0 +1,14 @@
+namespace: {{ namespace }}
+name: {{ collection_name }}
+version: "{{ (version|quote) is version("0.0.0", operator="gt", version_type="semver")|ternary(version, undef("version must be a valid semantic version greater than 0.0.0")) }}"
+readme: README.md
+authors:
+    - dstout-devops
+tags: [devops, devcontainer, docker, infrastructure, tools]
+repository: {{ collection_repo }}
+build_ignore:
+    - galaxy.yml.j2
+    - .gitignore
+dependencies: {{ dependencies|default({}, true) }}
+license:
+    - MIT

@@ -1,0 +1,11 @@
+resource "docker_image" "image" {
+  name = "{{ docker_image }}"
+}
+
+{% for i in range(swarm_nodes) %}
+resource "docker_container" "swarm_node_{{ i }}" {
+  image = docker_image.image.image_id
+  name  = "{{ container_name }}_{{ i }}"
+  privileged = true
+}
+{% endfor %}

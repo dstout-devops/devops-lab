@@ -1,0 +1,5 @@
+plugin: community.docker.docker_containers
+docker_host: unix:///var/run/docker.sock
+
+groups:
+  swarm_nodes: docker_config.Labels.role == 'swarm'
