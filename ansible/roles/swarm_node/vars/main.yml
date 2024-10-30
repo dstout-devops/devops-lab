@@ -1,0 +1,5 @@
+swarm_node_docker_host: "localhost"
+swarm_node_container_name: "swarm_node"
+swarm_node_docker_image: "docker:dind"
+
+swarm_node_terraform_dir: "~/.terraform/swarm_node"

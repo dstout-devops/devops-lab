@@ -13,7 +13,7 @@
 
 - name: Terraform - Create Directory
   ansible.builtin.file:
-    path: "{{ terraform_dir }}"
+    path: "{{ swarm_node_terraform_dir }}"
     state: directory
     mode: '0644'
   tags:
@@ -21,7 +21,7 @@
 
 - name: Terraform - Check Directory
   ansible.builtin.find:
-    paths: "{{ terraform_dir }}"
+    paths: "{{ swarm_node_terraform_dir }}"
     patterns: "*.tf"
   register: files_to_delete
   tags:
@@ -38,7 +38,7 @@
 - name: Terraform - Generate Node Files
   ansible.builtin.template:
     src: swarm_node.tf.j2
-    dest: "{{ terraform_dir }}/swarm_node.tf"
+    dest: "{{ swarm_node_terraform_dir }}/swarm_node.tf"
     mode: '0644'
   tags:
     - always
@@ -46,7 +46,7 @@
 - name: Terraform - Generate Provider
   ansible.builtin.template:
     src: main.tf.j2
-    dest: "{{ terraform_dir }}/main.tf"
+    dest: "{{ swarm_node_terraform_dir }}/main.tf"
     mode: '0755'
   tags:
     - always
@@ -56,7 +56,7 @@
   register: _terraform_init_state
   changed_when: false
   args:
-    chdir: "{{ terraform_dir }}"
+    chdir: "{{ swarm_node_terraform_dir }}"
   tags:
     - terraform_init
 
@@ -65,7 +65,7 @@
   register: _terraform_plan
   changed_when: false
   args:
-    chdir: "{{ terraform_dir }}"
+    chdir: "{{ swarm_node_terraform_dir }}"
   tags:
     - terraform_apply
     - terraform_plan
@@ -76,7 +76,7 @@
   register: _terraform_apply
   changed_when: false
   args:
-    chdir: "{{ terraform_dir }}"
+    chdir: "{{ swarm_node_terraform_dir }}"
   when: _terraform_plan['rc'] == 0 or _terraform_plan['rc'] == 2
   tags:
     - terraform_apply
@@ -86,6 +86,6 @@
   register: _terraform_destroy
   changed_when: false
   args:
-    chdir: "{{ terraform_dir }}"
+    chdir: "{{ swarm_node_terraform_dir }}"
   tags:
     - terraform_destroy

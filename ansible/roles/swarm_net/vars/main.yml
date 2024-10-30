@@ -1,0 +1,2 @@
+swarm_net_terraform_dir: "~/.terraform/swarm_net"
+swarm_net_network_name: "swarm_net"

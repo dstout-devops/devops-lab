@@ -1,5 +1,13 @@
-- name: Enable Swarm Host
+- name: Provision Lab
   hosts: localhost
   become: true
-  roles:
-    - swarm-node
+  vars:
+    availability_zones: 3
+
+  tasks:
+    - name: Swarm
+      ansible.builtin.import_role:
+        name: swarm_node
+
+      vars:
+        swarm_node_count: "{{ availability_zones }}"

@@ -1,0 +1,10 @@
+resource "docker_network" "swarm_net_global" {
+    name = "swarm_net_global"
+}
+{% for i in range(swarm_net_count) %}
+resource "docker_network" "swarm_net_{{ i }}" {
+  name  = "{{ swarm_net_network_name }}_{{ i }}"
+  ipam_config:
+    - subnet: 172.19.{{ i }}.0/24
+}
+{% endfor %}
